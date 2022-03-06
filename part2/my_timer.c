@@ -3,7 +3,7 @@
 #include <linux/proc_fs.h>
 #include <linux/slab.h>
 #include <linux/string.h>
-#include <asm-generic/uaccess.h>
+// #include <asm-generic/uaccess.h>
 #include <linux/kernel.h>
 #include <linux/time.h>
 
@@ -19,23 +19,28 @@ static struct file_operations fops;
 
 // static char *message;
 // static int read_p;
-static char *msg_1 = "current time: ";
-static char *msg2 = "elapsed time: ";
+// static char *msg_1 = "current time: ";
+// static char *msg2 = "elapsed time: ";
 
 // time.h reference
 // https://docs.huihoo.com/doxygen/linux/kernel/3.7/include_2linux_2time_8h.html
 
-int my_timer_proc_open(void) {
+int my_timer_proc_open(struct inode *sp_inode, struct file *sp_file) {
   // setting up variables for read?
+  printk("proc called open\n");
   return 0;
 }
 
-int my_timer_proc_read(void) {
+ssize_t my_timer_proc_read(struct file *sp_file, char __user *buf, size_t
+size, loff_t *offset) {
   // this is where we print the current time and time elapsed
+  printk("proc called read\n");
   return 0;
 }
 
-int my_timer_proc_release(void) {
+static int my_timer_proc_release(struct inode *sp_inode,
+struct file *sp_file) {
+  printk("proc called release\n");
   return 0;
 }
 
@@ -56,7 +61,7 @@ int my_timer_init(void) {
 }
 
 // not sure if this is needed
-// module_init(my_timer_proc_init);
+module_init(my_timer_init);
 
 void my_timer_exit(void) {
   remove_proc_entry(ENTRY_NAME, NULL);
@@ -66,4 +71,4 @@ void my_timer_exit(void) {
 }
 
 // not sure if this is needed
-// module_exit(my_timer_proc_exit);
+module_exit(my_timer_exit);
