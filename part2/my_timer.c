@@ -16,33 +16,44 @@ MODULE_DESCRIPTION("Timer to print current time and elapsed time since last call
 #define PERMS 0644
 #define PARENT NULL
 static struct file_operations fops;
-
-// static char *message;
-// static int read_p;
-// static char *msg_1 = "current time: ";
-// static char *msg2 = "elapsed time: ";
+static int activated = 0;
+static long ns_temp;
+static long long s_temp;
 
 // time.h reference
 // https://docs.huihoo.com/doxygen/linux/kernel/3.7/include_2linux_2time_8h.html
 
 int my_timer_proc_open(struct inode *sp_inode, struct file *sp_file) {
   // setting up variables for read?
-  printk("proc called open\n");
+  // printk("proc called open\n");
   return 0;
 }
 
-ssize_t my_timer_proc_read(struct file *sp_file, char __user *buf, size_t
-size, loff_t *offset) {
+ssize_t my_timer_proc_read(struct file *sp_file, char __user *buf, size_t size, loff_t *offset) {
   // this is where we print the current time and time elapsed
-  printk("proc called read\n");
+  // printk("proc called read\n");
   struct timespec ts = current_kernel_time();
-  printk("time since epoch: %lld", (long long)(ts.tv_sec));
+  long ns_time = ts.tv_nsec;
+  long long s_time = (long long)(ts.tv_sec);
+  printk("current time: %lld.%ld", s_time, ns_time);
+
+  if (activated != 1) {
+    activated = 1;
+    ns_temp = ns_time;
+    s_temp = s_time;
+  }
+  else {
+    printk("elapsed time: %lld.%ld", s_time-s_temp, ns_time-ns_temp);
+    ns_temp = ns_time;
+    s_temp = s_time;
+  }
+
   return 0;
 }
 
 static int my_timer_proc_release(struct inode *sp_inode,
 struct file *sp_file) {
-  printk("proc called release\n");
+  // printk("proc called release\n");
   return 0;
 }
 
