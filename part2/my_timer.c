@@ -35,6 +35,8 @@ ssize_t my_timer_proc_read(struct file *sp_file, char __user *buf, size_t
 size, loff_t *offset) {
   // this is where we print the current time and time elapsed
   printk("proc called read\n");
+  struct timespec ts = current_kernel_time();
+  printk("time since epoch: %lld", (long long)(ts.tv_sec));
   return 0;
 }
 
