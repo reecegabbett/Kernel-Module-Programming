@@ -340,8 +340,8 @@
 331	common	pkey_free		sys_pkey_free
 332	common	statx			sys_statx
 335 common  start_elevator  sys_start_elevator
-336 common  issue_request sys_issue_request
-337 common  stop_elevator sys_stop_elevator
+336 common  issue_request   sys_issue_request
+337 common  stop_elevator   sys_stop_elevator
 #
 # x32-specific system call numbers start at 512 to avoid cache impact
 # for native 64-bit operation.
