@@ -1,1 +1,4 @@
+# finley's personal folder used to share files with shared folder on virtualbox
 shared/
+# a folder to test the hello world kernel module in slide 3
+test-kernel/
