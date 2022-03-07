@@ -6,12 +6,12 @@
 // #include <asm-generic/uaccess.h>
 #include <linux/kernel.h>
 #include <linux/time.h>
-#inlcude <linux/list.h>
+#include <linux/list.h>
 
 
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Dylan Finley Reece");
+MODULE_AUTHOR("Group 27");
 MODULE_DESCRIPTION("Implement a scheduling algorithm for a pet elevator.");
 
 struct elevator
