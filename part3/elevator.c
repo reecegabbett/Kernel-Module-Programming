@@ -13,6 +13,7 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Group 27");
 MODULE_DESCRIPTION("Implement a scheduling algorithm for a pet elevator.");
 
+<<<<<<< Updated upstream
 #define BUF_LEN 100
 
 static struct proc_dir_entry* proc_entry;
@@ -89,6 +90,7 @@ static void elevator_exit(void)
 struct elevator
 {
    /* data */     
+=======
 // Typedef might be illegal in Kernel programming
 typedef struct Elevator {
 	Passenger* pass_list;
@@ -107,6 +109,7 @@ typedef struct Elevator {
 struct list_head {
 	struct list_head *next;
 	struct list_head *prev;
+>>>>>>> Stashed changes
 };
 
 struct Passenger {
