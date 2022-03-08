@@ -3,16 +3,90 @@
 #include <linux/proc_fs.h>
 #include <linux/slab.h>
 #include <linux/string.h>
-// #include <asm-generic/uaccess.h>
+#include <asm-generic/uaccess.h>
 #include <linux/kernel.h>
 #include <linux/time.h>
 #include <linux/list.h>
+#include <linux/uaccess.h>
 
 
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Group 27");
 MODULE_DESCRIPTION("Implement a scheduling algorithm for a pet elevator.");
+
+#define BUF_LEN 100
+
+static struct proc_dir_entry* proc_entry;
+
+static char msg[BUF_LEN];
+static int procfs_buf_len;
+
+
+//Basic read proc file
+static ssize_t procfile_read(struct file* file, char * ubuf, size_t count, loff_t *ppos)
+{
+	printk(KERN_INFO "proc_read\n");
+	procfs_buf_len = strlen(msg);
+
+	if (*ppos > 0 || count < procfs_buf_len)
+		return 0;
+
+	if (copy_to_user(ubuf, msg, procfs_buf_len))
+		return -EFAULT;
+
+	*ppos = procfs_buf_len;
+
+	printk(KERN_INFO "gave to user %s\n", msg);
+
+	return procfs_buf_len;
+}
+
+//Basic write to proc file
+static ssize_t procfile_write(struct file* file, const char * ubuf, size_t count, loff_t* ppos)
+{
+	printk(KERN_INFO "proc_write\n");
+
+	if (count > BUF_LEN)
+		procfs_buf_len = BUF_LEN;
+	else
+		procfs_buf_len = count;
+
+	copy_from_user(msg, ubuf, procfs_buf_len);
+
+	printk(KERN_INFO "got from user: %s\n", msg);
+
+	return procfs_buf_len;
+}
+
+//Establishing read and write functions
+static struct file_operations procfile_fops = {
+	.owner = THIS_MODULE,
+	.read = procfile_read,
+	.write = procfile_write,
+};
+
+//initialize elevator
+static int elevator_init(void)
+{
+	proc_entry = proc_create("elevator", 0666, NULL, &procfile_fops);
+
+	if (proc_entry == NULL)
+		return -ENOMEM;
+	
+	return 0;
+}
+
+//exit elevator
+static void elevator_exit(void)
+{
+	proc_remove(proc_entry);
+	return;
+}
+
+
+
+// Basic structs and funcs
 
 struct elevator
 {
@@ -51,3 +125,7 @@ int stop_elevator(void){
     0 otherwise.  */
 
 }
+
+
+module_init(elevator_init);
+module_exit(elevator_exit);
