@@ -9,8 +9,6 @@
 #include <linux/list.h>
 #include <linux/uaccess.h>
 
-
-
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Group 27");
 MODULE_DESCRIPTION("Implement a scheduling algorithm for a pet elevator.");
@@ -91,32 +89,57 @@ static void elevator_exit(void)
 struct elevator
 {
    /* data */     
+// Typedef might be illegal in Kernel programming
+typedef struct Elevator {
+	Passenger* pass_list;
+	pass_list = kmalloc(sizeof(Passenger),__GFP_RECLAIM); 	        /* Passenger list */
+	char state[7]; 													/* OFFLINE, IDLE, LOADING, UP, DOWN */
+	int cats;														/* Number of cats */
+	int current_floor;												/* 1-10 */
+	int dogs;														/* Number of dogs */
+	int lizards;													/* Number of lizards */
+	int passengers;													/* Total number of passengers */
+	int serviced;													/* Total number of passengers serviced */
+	int weight;														/* Total number of passengers weighting */
+} Elevator;
+
+// List implementation guidelines following slides 10
+struct list_head {
+	struct list_head *next;
+	struct list_head *prev;
 };
 
-typedef struct 
-{
-    /* data */
-} Passenger ;
+struct Passenger {
+    /* Passenger base class */
+	int destination_floor;
+	int num;					/* Passenger number in current list */
+	int type;				
+	int weight;			 
+	struct list_head list;		/* Allows passenger to be part of a list */
+};
 
-int start_elevator(void){
+/* Create new Passengers using NEW_?(x, y, z) where x is instance name; y is destination floor; z is number in current list */
+#define NEW_CAT(x, y, z) struct Passenger x = {.destination_floor = y, .num = z, .type = 0, .weight = 15}
+#define NEW_DOG(x, y, z) struct Passenger x = {.destination_floor = y, .num = z, .type = 1, .weight = 45}
+#define NEW_LIZARD(x, y, z) struct Passenger x = {.destination_floor = y, .num = z, .type = 2, .weight = 5}
 
+int start_elevator(void) {
     /* Activates the elevator for service. From that point onward, the elevator exists and will begin to 
     service requests. This system call will return 1 if the elevator is already active, 0 for a successful
     elevator start, and -ERRORNUM if it could not initialize (e.g. -ENOMEM if it couldn’t allocate 
     memory). */
-
+	INIT_LIST_HEAD(); 
 }
 
-int issue_request (int start_floor, int destination_floor, int type){
-
+int issue_request (int start_floor, int destination_floor, int type) {
     /* Creates a request for a passenger at start_floor that wishes to go to destination_floor. type is an 
     indicator variable where 0 represents a cat, 1 represents a dog, and 2 represents a lizard. This 
     function returns 1 if the request is not valid (one of the variables is out of range or invalid type),
     and 0 otherwise. */
+	
+} 
 
-}
-
-int stop_elevator(void){
+int stop_elevator(void) {
 
     /* Deactivates the elevator. At this point, the elevator will process no more new requests (that is, 
     passengers waiting on floors). However, before an elevator completely stops, it must offload all 
