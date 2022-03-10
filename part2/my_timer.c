@@ -9,7 +9,7 @@
 
 
 MODULE_LICENSE("GPL");
-MODULE_AUTHOR("Dylan Finley Reece");
+MODULE_AUTHOR("Group 27");
 MODULE_DESCRIPTION("Timer to print current time and elapsed time since last call");
 
 #define ENTRY_NAME "timer"
