@@ -47,6 +47,54 @@ struct Passenger {
 
 
 //Proc I/O
+const char* print_passengers(void) {
+    
+    char *buf = kmalloc(sizeof(char) * 1000, __GFP_RECLAIM);
+    if (buf == NULL) {
+   	 printk(KERN_ALERT "Error writing daita in print_passengers");
+   	 return -ENOMEM;
+    }
+
+    sprintf(buf, "Elevator state: %s\n", elevator.state);  	 
+    strcat(message, buf);
+    sprintf(buf, "Elevator floor: %d\n", elevator.current_floor);   
+    strcat(message, buf);
+    sprintf(buf, "Current weight: %d\n", elevator.weight);   
+    strcat(message, buf);
+    sprintf(buf, "Elevator status: %d C, %d D, %d L\n", elevator.cats, elevator.dogs, elevator.lizards);                          	 
+    strcat(message, buf);
+    sprintf(buf, "Number of passengers: %d\n", elevator.passengers);   
+    strcat(message, buf);
+    sprintf(buf, "Number of passengers waiting: ?\n");   
+    strcat(message, buf);
+    sprintf(buf, "Number of passengers serviced: %d\n", elevator.serviced);                          	 
+    strcat(message, buf);
+	sprintf(buf,"[ ] Floor 10:\n");
+	strcat(message, buf);
+	sprintf(buf,"[ ] Floor 9:\n");
+	strcat(message, buf);
+	sprintf(buf,"[ ] Floor 8:\n");
+	strcat(message, buf);
+	sprintf(buf,"[ ] Floor 7:\n");
+	strcat(message, buf);
+	sprintf(buf,"[ ] Floor 6:\n");
+	strcat(message, buf);
+	sprintf(buf,"[ ] Floor 5:\n");
+	strcat(message, buf);
+	sprintf(buf,"[ ] Floor 4:\n");
+	strcat(message, buf);
+	sprintf(buf,"[ ] Floor 3:\n");
+	strcat(message, buf);
+	sprintf(buf,"[ ] Floor 2:\n");
+	strcat(message, buf);
+	sprintf(buf,"[ ] Floor 1:\n");
+	strcat(message, buf);
+    
+    //kfree(buf);
+    return buf;
+}
+
+
 static ssize_t elevator_proc_read(struct file* file, char * ubuf, size_t count, loff_t *ppos)
 {
 	printk(KERN_INFO "proc_read\n");
@@ -74,7 +122,7 @@ static ssize_t elevator_proc_write(struct file* file, const char * ubuf, size_t 
 	else
 		len = count;
 
-	copy_from_user(message, ubuf, len);
+	copy_from_user(print_passengers(), ubuf, len);
 
 	printk(KERN_INFO "got from user: %s\n", message);
 
@@ -97,32 +145,7 @@ static struct file_operations procfile_fops = {
 
 
 //Elevator Funcs and Syscalls
-int print_passengers(void) {
-    
-    char *buf = kmalloc(sizeof(char) * 100, __GFP_RECLAIM);
-    if (buf == NULL) {
-   	 printk(KERN_ALERT "Error writing data in print_passengers");
-   	 return -ENOMEM;
-    }
 
-    sprintf(buf, "Elevator state: %s\n", elevator.state);  	 
-    strcat(message, buf);
-    sprintf(buf, "Elevator floor: %d\n", elevator.current_floor);   
-    strcat(message, buf);
-    sprintf(buf, "Current weight: %d\n", elevator.weight);   
-    strcat(message, buf);
-    sprintf(buf, "Elevator status: %d C, %d D, %d L\n", elevator.cats, elevator.dogs, elevator.lizards);                          	 
-    strcat(message, buf);
-    sprintf(buf, "Number of passengers: %d\n", elevator.passengers);   
-    strcat(message, buf);
-    sprintf(buf, "Number of passengers waiting: ?");   
-    strcat(message, buf);
-    sprintf(buf, "Number of passengers serviced: %d\n", elevator.serviced);                          	 
-    strcat(message, buf);
-    
-    //kfree(buf);
-    return 0;
-}
 
 int start_elevator(void) {
 	/* Activates the elevator for service. From that point onward, the elevator exists and will begin to
