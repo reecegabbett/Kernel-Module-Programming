@@ -51,6 +51,8 @@ SYSCALL_DEFINE0(stop_elevator) {
 }
 
 
-
+arch/x86/entry/syscall_64.o:(.rodata+0xa78): undefined reference to `__x64_sys_start_elevator' 
+arch/x86/entry/syscall_64.o:(.rodata+0xa80): undefined reference to `__x64_sys_issue_request' 
+makefile:1030: recipe for target 'vmlinux' failed make: *** [vmlinux] error 1
 
 
