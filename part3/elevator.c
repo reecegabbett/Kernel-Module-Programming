@@ -112,7 +112,7 @@ const char* print_passengers(void) {
     }
     sprintf(buf, "Elevator state: %s\n", state);    
     strcat(message, buf);
-    sprintf(buf, "Elevator floor: %d\n", elevator.current_floor);  
+    sprintf(buf, "Elevator floor: %d\n", elevator.current_floor+1);  
     strcat(message, buf);
     sprintf(buf, "Current weight: %d\n", elevator.weight);  
     strcat(message, buf);
@@ -144,15 +144,16 @@ const char* print_passengers(void) {
             tempPass = list_entry(temp,Passenger,list);
 
             if(tempPass->type==0){
-                sprintf(buf,"C ");
+                sprintf(buf," C ");
+                strcat(message, buf);
+                
+            }
+            else if(tempPass->type==1){
+                sprintf(buf," D ");
                 strcat(message, buf);
             }
-            if(tempPass->type==1){
-                sprintf(buf,"D ");
-                strcat(message, buf);
-            }
-            if(tempPass->type==2){
-                sprintf(buf,"L ");
+            else if(tempPass->type==2){
+                sprintf(buf," L ");
                 strcat(message, buf);
             }
             
@@ -254,6 +255,7 @@ int scheduler(void *data) {
 	struct Elevator *parameter = data;
 	int state = parameter->state;
 	while(!kthread_should_stop()) {
+        ssleep(3);
 		if(mutex_lock_interruptible(&elevator.mutex) == 0) {
             state = parameter->state;
             mutex_unlock(&elevator.mutex);
@@ -289,6 +291,7 @@ int add_passenger(int start_floor, int destination_floor, int type){
     temp_passenger = kmalloc(sizeof(Passenger)*1, __GFP_RECLAIM);
     start_floor--;
     destination_floor--;
+    temp_passenger->type=type;
     temp_passenger->beginning_floor=start_floor;
     temp_passenger->destination_floor=destination_floor;
     if (temp_passenger->type==0){
