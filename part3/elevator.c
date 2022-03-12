@@ -13,8 +13,9 @@
 #include <linux/delay.h>
 #include <linux/kthread.h>
 #include <linux/random.h>
- 
- 
+#include <linux/stddef.h>
+
+
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Group 27");
 MODULE_DESCRIPTION("Implement a scheduling algorithm for a pet elevator.");
@@ -30,9 +31,7 @@ MODULE_DESCRIPTION("Implement a scheduling algorithm for a pet elevator.");
 #define DOWN 4
 #define TOP_FLOOR 10
  
-#define NEW_CAT(x, y, z) struct Passenger x = {.destination_floor = y, .num = z, .type = 0, .weight = 15}
-#define NEW_DOG(x, y, z) struct Passenger x = {.destination_floor = y, .num = z, .type = 1, .weight = 45}
-#define NEW_LIZARD(x, y, z) struct Passenger x = {.destination_floor = y, .num = z, .type = 2, .weight = 5}
+
  
 static struct proc_dir_entry* proc_entry;
 static char message[BUF_LEN];
@@ -42,7 +41,7 @@ bool elevator_on;
 //Structures
 struct Elevator{
     struct list_head pass_list;              // Allows passenger to be part of a list; slides 10
-    struct task_struct *kthread;
+	struct task_struct *kthread;
     struct mutex mutex;
     int state;                           // OFFLINE, IDLE, LOADING, UP, DOWN
     int cats;                                // Number of cats
@@ -53,33 +52,37 @@ struct Elevator{
     int serviced;                            // Total number of passengers serviced
     int weight;                              // Total number of passengers weighting
 };
- 
+
 struct Elevator elevator;
  
 typedef struct {
     int destination_floor;
-    int beginning_floor;
+	int beginning_floor;
     int type;                
     int weight;          
     struct list_head list;       // Allows passenger to be part of a list; slides 10
 } Passenger;
- 
+
 typedef struct {
     struct list_head waiting_list;
+    bool busy;
+    int size;
+    
 } Floor;
- 
+
 struct {
     Floor **floor_list;
- 
+    int waiting;
     struct mutex mutex;
 } Tower;
- 
+
+
  
 int add_passenger(int start_floor, int destination_floor, int type);
- 
- 
- 
- 
+
+
+
+
 //Returns string to write to PROC
 const char* print_passengers(void) {
    
@@ -88,8 +91,26 @@ const char* print_passengers(void) {
      printk(KERN_ALERT "Error writing daita in print_passengers");
      return -ENOMEM;
     }
-    /*
-    sprintf(buf, "Elevator state: %s\n", elevator.state);    
+    char state[10];
+    switch(elevator.state){
+        case IDLE :
+            strcpy(state, "IDLE");
+            break;
+        case OFFLINE :
+            strcpy(state, "OFFLINE");
+            break;
+        case LOADING :
+            strcpy(state, "LOADING");
+            break;
+        case DOWN :
+            strcpy(state, "DOWN");
+            break;
+        case UP :
+            strcpy(state, "UP");
+            break;
+        
+    }
+    sprintf(buf, "Elevator state: %s\n", state);    
     strcat(message, buf);
     sprintf(buf, "Elevator floor: %d\n", elevator.current_floor);  
     strcat(message, buf);
@@ -99,31 +120,50 @@ const char* print_passengers(void) {
     strcat(message, buf);
     sprintf(buf, "Number of passengers: %d\n", elevator.passengers);  
     strcat(message, buf);
-    sprintf(buf, "Number of passengers waiting: ?\n");  
+    sprintf(buf, "Number of passengers waiting: %d\n", Tower.waiting);  
     strcat(message, buf);
     sprintf(buf, "Number of passengers serviced: %d\n", elevator.serviced);                              
     strcat(message, buf);
-    sprintf(buf,"[ ] Floor 10:\n");
-    strcat(message, buf);
-    sprintf(buf,"[ ] Floor 9:\n");
-    strcat(message, buf);
-    sprintf(buf,"[ ] Floor 8:\n");
-    strcat(message, buf);
-    sprintf(buf,"[ ] Floor 7:\n");
-    strcat(message, buf);
-    sprintf(buf,"[ ] Floor 6:\n");
-    strcat(message, buf);
-    sprintf(buf,"[ ] Floor 5:\n");
-    strcat(message, buf);
-    sprintf(buf,"[ ] Floor 4:\n");
-    strcat(message, buf);
-    sprintf(buf,"[ ] Floor 3:\n");
-    strcat(message, buf);
-    sprintf(buf,"[ ] Floor 2:\n");
-    strcat(message, buf);
-    sprintf(buf,"[ ] Floor 1:\n");
-    strcat(message, buf);
-   */
+
+    int elevator_here; 
+    elevator_here= elevator.current_floor;
+    int i =TOP_FLOOR-1;
+    for (i; i >= 0; i--){
+        char marker = ' ';
+        if (elevator_here==i){
+            marker='*';
+        }
+        int floor = i +1;
+        sprintf(buf,"[%c] Floor %d: %d", marker, floor, Tower.floor_list[i]->size);
+        strcat(message, buf);
+        struct list_head* temp;
+        struct list_head* dummy;
+        Passenger* tempPass;
+        list_for_each_safe(temp, dummy, &Tower.floor_list[i]->waiting_list){
+
+            tempPass = list_entry(temp,Passenger,list);
+
+            if(tempPass->type==0){
+                sprintf(buf,"C ");
+                strcat(message, buf);
+            }
+            if(tempPass->type==1){
+                sprintf(buf,"D ");
+                strcat(message, buf);
+            }
+            if(tempPass->type==2){
+                sprintf(buf,"L ");
+                strcat(message, buf);
+            }
+            
+        }
+        
+
+        sprintf(buf,"\n");
+        strcat(message, buf);
+    }
+
+   
     //kfree(buf);
     return buf;
 }
@@ -171,7 +211,7 @@ int elevator_proc_release(struct inode *sp_inode, struct file *sp_file)  {
     return 0;
 }
  
-//PROC File Operations
+//PROC File Operations 
 static struct file_operations procfile_fops = {
     .owner = THIS_MODULE,
     .read = elevator_proc_read,
@@ -181,54 +221,106 @@ static struct file_operations procfile_fops = {
  
  
 //Syscalls
-extern long (*STUB_start_elevator)(void);
+extern long (*STUB_start_elevator)(void); 
 long start_elevator(void) {
     elevator_on=true;
-    if(elevator.state == OFFLINE) {
-        return 0;
-    }
+	if(elevator.state == OFFLINE) {
+		return 0;
+	}
     return 1;
 }
- 
-extern long (*STUB_issue_request)(int,int,int);
+
+extern long (*STUB_issue_request)(int,int,int); 
 long issue_request(int start_floor, int destination_floor, int type) {
-    if(start_floor >= 0 && start_floor < TOP_FLOOR && destination_floor >= 0 && destination_floor < TOP_FLOOR) {
-        add_passenger(start_floor, destination_floor, type);
-        return 0;
-    }
+    if(start_floor >= 0 && start_floor <= TOP_FLOOR && destination_floor >= 0 && destination_floor <= TOP_FLOOR) {
+		add_passenger(start_floor, destination_floor, type);
+		return 0;
+	}
     return 1;
 }
- 
-extern long (*STUB_stop_elevator)(void);
+
+extern long (*STUB_stop_elevator)(void); 
 long stop_elevator(void) {
     if(elevator_on == true){
-        elevator_on=false;
-        return 0;
-    }
+		elevator_on=false;
+		return 0;
+	}
     return 1;
 }
- 
+
 //Scheduler and Helper Functions
 int scheduler(void *data) {
-    printk(KERN_ALERT "SUCCESS\n");
-    struct Elevator *parameter = data;
-    int state = parameter->state;
-    while(!kthread_should_stop()) {
-        if(mutex_lock_interruptible(&elevator.mutex) == 0) {
+	printk(KERN_ALERT "SUCCESS\n");
+	struct Elevator *parameter = data;
+	int state = parameter->state;
+	while(!kthread_should_stop()) {
+		if(mutex_lock_interruptible(&elevator.mutex) == 0) {
             state = parameter->state;
             mutex_unlock(&elevator.mutex);
         }
-    }
-    return 0;
+        if(state==IDLE){
+
+        }
+        else if (state==OFFLINE){
+
+        }
+        else if (state==LOADING){
+
+        }
+        else if(state==DOWN){
+
+        }
+        else if(state==UP){
+
+        }
+        else{
+            return -1;
+        }
+
+	}
+	return 0;
 }
- 
+
 int add_passenger(int start_floor, int destination_floor, int type){
+    
+
+	Passenger *temp_passenger;
+    
+    temp_passenger = kmalloc(sizeof(Passenger)*1, __GFP_RECLAIM);
+    start_floor--;
+    destination_floor--;
+    temp_passenger->beginning_floor=start_floor;
+    temp_passenger->destination_floor=destination_floor;
+    if (temp_passenger->type==0){
+        temp_passenger->weight=15;
+    } else if (temp_passenger->type==1){
+        temp_passenger->weight=45;
+    } else if (temp_passenger->type==2){
+       temp_passenger->weight=5;
+    } else {
+        return -1;
+    }
+    
+
+    if(destination_floor == start_floor){
+        return -1;
+    }
+    INIT_LIST_HEAD(&temp_passenger->list);
+    if(mutex_lock_interruptible(&Tower.mutex)==0){
+        Tower.floor_list[start_floor]->busy=true;
+        list_add_tail(&temp_passenger->list, &Tower.floor_list[start_floor]->waiting_list);
+        Tower.floor_list[start_floor]->size++;
+        mutex_unlock(&Tower.mutex);
+    }
+    printk(KERN_ALERT "PASSENGER CREATED\n");
+    Tower.waiting++;
     return 0;
+
 }
- 
+
 //Initializations
 void thread_init(struct Elevator *parameters){
-   
+	
     parameters->state = OFFLINE;                           // OFFLINE, IDLE, LOADING, UP, DOWN
     parameters->cats = 0;                                // Number of cats
     parameters->current_floor = 0;                       // 1-10
@@ -237,14 +329,14 @@ void thread_init(struct Elevator *parameters){
     parameters->passengers = 0;                          // Total number of passengers
     parameters->serviced = 0;                            // Total number of passengers serviced
     parameters->weight = 0;    
-    mutex_init(&parameters->mutex);
-    INIT_LIST_HEAD(&parameters->pass_list);              // Allows passenger to be part of a list; slides 10
-    parameters->kthread = kthread_run(scheduler, parameters, "elevator");
-   
+	mutex_init(&parameters->mutex);
+	INIT_LIST_HEAD(&parameters->pass_list);              // Allows passenger to be part of a list; slides 10
+	parameters->kthread = kthread_run(scheduler, parameters, "elevator");
+    
 }
  
- 
- 
+
+
  
 static int elevator_init(void)
 {
@@ -253,21 +345,24 @@ static int elevator_init(void)
     STUB_stop_elevator = stop_elevator;
     proc_entry = proc_create("elevator", 0660, NULL, &procfile_fops);
     printk(KERN_ALERT "proc file created\n");
- 
+
     if (proc_entry == NULL){
         return -ENOMEM;
     }
  
     elevator_on=true;
-    mutex_init(&Tower.mutex);
-    Tower.floor_list = kmalloc_array(TOP_FLOOR, sizeof(Floor*), __GFP_RECLAIM);
-    int i =0;
+	mutex_init(&Tower.mutex);
+	Tower.floor_list = kmalloc_array(TOP_FLOOR, sizeof(Floor*), __GFP_RECLAIM);
+	int i =0;
+    Tower.waiting=0;
     for(i; i < TOP_FLOOR; i++) {
         Floor *f = kmalloc(sizeof(Floor)*1, __GFP_RECLAIM);
         INIT_LIST_HEAD(&f->waiting_list);
         Tower.floor_list[i] = f;
+        Tower.floor_list[i]->busy=false;
+        Tower.floor_list[i]->size=0;
     }
-    thread_init(&elevator);
+	thread_init(&elevator);
     return 0;
 }
  
@@ -276,19 +371,19 @@ static void elevator_exit(void)
     STUB_start_elevator = NULL;
     STUB_issue_request = NULL;
     STUB_stop_elevator = NULL;
- 
-    if(mutex_lock_interruptible(&Tower.mutex) == 0) {
-        Floor *f;
-        int i;
-        for(i = 0; i < TOP_FLOOR; i++) {
-            f = Tower.floor_list[i];
-            kfree(f);
-        }
-    }  
+
+	if(mutex_lock_interruptible(&Tower.mutex) == 0) {
+		Floor *f;
+    	int i;
+    	for(i = 0; i < TOP_FLOOR; i++) {
+        	f = Tower.floor_list[i];
+        	kfree(f);
+    	}
+	}	
     proc_remove(proc_entry);
-    kthread_stop(elevator.kthread);
-    mutex_destroy(&elevator.mutex);
- 
+	kthread_stop(elevator.kthread);
+	mutex_destroy(&elevator.mutex);
+
     printk(KERN_ALERT "exiting\n");
     return;
 }
@@ -297,4 +392,3 @@ static void elevator_exit(void)
  
 module_init(elevator_init);
 module_exit(elevator_exit);
-
