@@ -1,4 +1,4 @@
-whe#include <linux/init.h>
+#include <linux/init.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/proc_fs.h>
@@ -278,8 +278,9 @@ int scheduler(void *data) {
                   //if people are waiting
                   Passenger * next_waiting;
 
-                  for (int i = 0; i < TOP_FLOOR; i++) {
-                    if (Tower.floor_list[i].size > 0) {
+                  int i;
+                  for (i = 0; i < TOP_FLOOR; i++) {
+                    if (Tower.floor_list[i]->size > 0) {
                       if (parameter->current_floor == i+1) {
                         parameter->state = LOADING;
                       }
@@ -330,6 +331,10 @@ int scheduler(void *data) {
                 //remove the head/passenger who's getting off
                 struct list_head *dummy, *temp;
                 Passenger *temp_pass;
+
+                struct list_head *dummy2, *temp2;
+                Passenger *temp_pass2;
+
                 int count=0;
 
                 list_for_each_safe(temp, dummy, &parameter->pass_list) {
@@ -338,7 +343,7 @@ int scheduler(void *data) {
                     // this is the "first item"
 
                     int tmp_type=temp_pass->type;
-                    list_del(temp)
+                    list_del(temp);
                     kfree(temp_pass);
 
                     parameter->passengers--; // decrease total number of passengers
@@ -362,8 +367,7 @@ int scheduler(void *data) {
 
                 // feed in waiting passengers until capacity is full
                 // update floor and tower
-                struct list_head *dummy2, *temp2;
-                Passenger *temp_pass2;
+
                 list_for_each_safe(temp2, dummy2, &Tower.floor_list[parameter->current_floor-1]->waiting_list) {
                   // will the next passenger still fit the weight limit and capacity limit
                   if ((temp_pass2->weight + parameter->weight) <= 100 && parameter->passengers+1 <=10) {
@@ -375,8 +379,8 @@ int scheduler(void *data) {
                     parameter->weight += temp_pass2->weight;
                     if (temp_pass2->type == 0) {
                       parameter->cats++;
-                    } else if (temp_pass2 == 1) {
-                      parameter->dogs++:
+                    } else if (temp_pass2->type == 1) {
+                      parameter->dogs++;
                     } else {
                       parameter->lizards++;
                     }
@@ -432,7 +436,7 @@ int scheduler(void *data) {
 
                     // somehow we got to DOWN even though the list is empty, error
                     if (next_pass == NULL) {
-                      return -1
+                      return -1;
                     }
                     if (next_pass->destination_floor == parameter->current_floor) {
                       parameter->state = LOADING;
@@ -467,7 +471,7 @@ int scheduler(void *data) {
                   next_pass = list_first_entry(parameter->pass_list, Passenger, list);
                   // somehow we got to DOWN even though the list is empty, error
                   if (next_pass == NULL) {
-                    return -1
+                    return -1;
                   }
 
                     //check if we need to unload at floor
@@ -492,43 +496,43 @@ int scheduler(void *data) {
     return 0;
 }
 
-int add_passenger(int start_floor, int destination_floor, int type){
-
-
-    Passenger *temp_passenger;
-
-    temp_passenger = kmalloc(sizeof(Passenger)*1, __GFP_RECLAIM);
-    start_floor--;
-    destination_floor--;
-    temp_passenger->type=type;
-    temp_passenger->beginning_floor=start_floor;
-    temp_passenger->destination_floor=destination_floor;
-    if (temp_passenger->type==0){
-        temp_passenger->weight=15;
-    } else if (temp_passenger->type==1){
-        temp_passenger->weight=45;
-    } else if (temp_passenger->type==2){
-       temp_passenger->weight=5;
-    } else {
-        return -1;
-    }
-
-
-    if(destination_floor == start_floor){
-        return -1;
-    }
-    INIT_LIST_HEAD(&temp_passenger->list);
-    if(mutex_lock_interruptible(&Tower.mutex)==0){
-        Tower.floor_list[start_floor]->busy=true;
-        list_add_tail(&temp_passenger->list, &Tower.floor_list[start_floor]->waiting_list);
-        Tower.floor_list[start_floor]->size++;
-        mutex_unlock(&Tower.mutex);
-    }
-    printk(KERN_ALERT "PASSENGER CREATED\n");
-    Tower.waiting++;
-    return 0;
-
-}
+// int add_passenger(int start_floor, int destination_floor, int type){
+//
+//
+//     Passenger *temp_passenger;
+//
+//     temp_passenger = kmalloc(sizeof(Passenger)*1, __GFP_RECLAIM);
+//     start_floor--;
+//     destination_floor--;
+//     temp_passenger->type=type;
+//     temp_passenger->beginning_floor=start_floor;
+//     temp_passenger->destination_floor=destination_floor;
+//     if (temp_passenger->type==0){
+//         temp_passenger->weight=15;
+//     } else if (temp_passenger->type==1){
+//         temp_passenger->weight=45;
+//     } else if (temp_passenger->type==2){
+//        temp_passenger->weight=5;
+//     } else {
+//         return -1;
+//     }
+//
+//
+//     if(destination_floor == start_floor){
+//         return -1;
+//     }
+//     INIT_LIST_HEAD(&temp_passenger->list);
+//     if(mutex_lock_interruptible(&Tower.mutex)==0){
+//         Tower.floor_list[start_floor]->busy=true;
+//         list_add_tail(&temp_passenger->list, &Tower.floor_list[start_floor]->waiting_list);
+//         Tower.floor_list[start_floor]->size++;
+//         mutex_unlock(&Tower.mutex);
+//     }
+//     printk(KERN_ALERT "PASSENGER CREATED\n");
+//     Tower.waiting++;
+//     return 0;
+//
+// }
 
 int add_passenger(int start_floor, int destination_floor, int type){
 
@@ -591,7 +595,7 @@ void thread_init(struct Elevator *parameters){
 static int elevator_init(void)
 {
     STUB_start_elevator = start_elevator;
-    STUB_quest = issue_request;
+    STUB_issue_request = issue_request;
     STUB_stop_elevator = stop_elevator;
     proc_entry = proc_create("elevator", 0660, NULL, &procfile_fops);
     printk(KERN_ALERT "proc file created\n");
