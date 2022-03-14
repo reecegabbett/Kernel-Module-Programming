@@ -328,9 +328,85 @@ int scheduler(void *data) {
             if(mutex_lock_interruptible(&elevator.mutex) == 0) {
                 //Loading and Unloading
                 //remove the head/passenger who's getting off
+                struct list_head *dummy, *temp;
+                Passenger *temp_pass;
+                int count=0;
+
+                list_for_each_safe(temp, dummy, &parameter->pass_list) {
+                  temp_pass = list_entry(temp, Passenger, list);
+                  if (count==parameter->passengers-1) {
+                    // this is the "first item"
+
+                    int tmp_type=temp_pass->type;
+                    list_del(temp)
+                    kfree(temp_pass);
+
+                    parameter->passengers--; // decrease total number of passengers
+                    parameter->serviced++;
+                    if (tmp_type == 0) { // cat
+                      parameter->cats--;
+                      parameter->weight -= 15;
+                    } else if (tmp_type == 1) { // dog
+                      parameter->dogs--;
+                      parameter->weight -= 45;
+                    } else {//lizard
+                      parameter->lizards--;
+                      parameter->weight -= 5;
+                    }
+
+
+                  }
+                  count++;
+
+                }
+
                 // feed in waiting passengers until capacity is full
                 // update floor and tower
+                struct list_head *dummy2, *temp2;
+                Passenger *temp_pass2;
+                list_for_each_safe(temp2, dummy2, &Tower.floor_list[parameter->current_floor-1]->waiting_list) {
+                  // will the next passenger still fit the weight limit and capacity limit
+                  if ((temp_pass2->weight + parameter->weight) <= 100 && parameter->passengers+1 <=10) {
+                    // add this passenger to the elevator
+                    add_passenger(temp_pass2->beginning_floor, temp_pass2->destination_floor, temp_pass2->type);
+                    // floor and tower stats are updated in the add_passenger
+                    // update elevator stats
+                    parameter->passengers++;
+                    parameter->weight += temp_pass2->weight;
+                    if (temp_pass2->type == 0) {
+                      parameter->cats++;
+                    } else if (temp_pass2 == 1) {
+                      parameter->dogs++:
+                    } else {
+                      parameter->lizards++;
+                    }
+                    // remove them from the current floor's list
+                    list_del(temp2);
+                    kfree(temp_pass2);
+
+
+                  }
+                  else {
+                    // the elevator is at weight limit or capacity
+                    break;
+                  }
+                }
+
                 // go to next floor
+                Passenger * next_pass;
+                next_pass = list_first_entry_or_null(parameter->pass_list, Passenger, list);
+                if (next_pass == NULL) {
+                  // everyone unboarded here
+                  parameter->state = IDLE;
+                }
+
+                if (next_pass->destination_floor > parameter->current_floor) {
+                  parameter->state = UP;
+                }
+                else if (next_pass->destination_floor < parameter->current_floor) {
+                  parameter->state = DOWN;
+                }
+
 
                 mutex_unlock(&elevator.mutex);
             }
@@ -483,7 +559,7 @@ int add_passenger(int start_floor, int destination_floor, int type){
     if(mutex_lock_interruptible(&Tower.mutex)==0){
         Tower.floor_list[start_floor]->busy=true;
         list_add_tail(&temp_passenger->list, &Tower.floor_list[start_floor]->waiting_list);
-        Tower.floor_list[start_floor]->size++;
+        Tower.floor_list[start_floor]->size--;
         mutex_unlock(&Tower.mutex);
     }
     printk(KERN_ALERT "PASSENGER CREATED\n");
