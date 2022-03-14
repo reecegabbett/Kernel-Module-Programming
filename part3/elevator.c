@@ -87,11 +87,21 @@ int add_passenger(int start_floor, int destination_floor, int type);
 const char* print_passengers(void) {
 
     char *buf = kmalloc(sizeof(char) * 1000, __GFP_RECLAIM);
+    char state[10];
+    int elevator_here;
+    int i;
+    int floor;
+    struct list_head* temp;
+    struct list_head* dummy;
+    Passenger* tempPass;
+
+    elevator_here = elevator.current_floor;
+
     if (buf == NULL) {
      printk(KERN_ALERT "Error writing data in print_passengers");
      return -ENOMEM;
     }
-    char state[10];
+
     switch(elevator.state){
         case IDLE :
             strcpy(state, "IDLE");
@@ -125,20 +135,15 @@ const char* print_passengers(void) {
     sprintf(buf, "Number of passengers serviced: %d\n", elevator.serviced);
     strcat(message, buf);
 
-    int elevator_here;
-    elevator_here= elevator.current_floor;
-    int i =TOP_FLOOR-1;
-    for (i; i >= 0; i--){
+
+    for (i = TOP_FLOOR-1; i >= 0; i--){
         char marker = ' ';
         if (elevator_here==i){
             marker='*';
         }
-        int floor = i +1;
+        floor = i + 1;
         sprintf(buf,"[%c] Floor %d: %d", marker, floor, Tower.floor_list[i]->size);
         strcat(message, buf);
-        struct list_head* temp;
-        struct list_head* dummy;
-        Passenger* tempPass;
         list_for_each_safe(temp, dummy, &Tower.floor_list[i]->waiting_list){
 
             tempPass = list_entry(temp,Passenger,list);
@@ -295,7 +300,7 @@ int scheduler(void *data) {
                   // need to loop through Tower.floor_list and find one with a size>0
                   // then go to that floor first
                   // make sure to change var names here
-                  next_waiting = list_first_entry_or_null(parameter->pass_list, Passenger, list);
+                  next_waiting = list_first_entry_or_null(&parameter->pass_list, Passenger, list);
                   if (next_waiting->destination_floor == parameter->current_floor) {
                     parameter->state = LOADING;
                   }
@@ -398,7 +403,7 @@ int scheduler(void *data) {
 
                 // go to next floor
                 Passenger * next_pass;
-                next_pass = list_first_entry_or_null(parameter->pass_list, Passenger, list);
+                next_pass = list_first_entry_or_null(&parameter->pass_list, Passenger, list);
                 if (next_pass == NULL) {
                   // everyone unboarded here
                   parameter->state = IDLE;
@@ -432,7 +437,7 @@ int scheduler(void *data) {
             if(mutex_lock_interruptible(&elevator.mutex) == 0) {
                 if(mutex_lock_interruptible(&Tower.mutex) == 0) {
                   Passenger * next_pass;
-                  next_pass = list_first_entry_or_null(parameter->pass_list, Passenger, list);
+                  next_pass = list_first_entry_or_null(&parameter->pass_list, Passenger, list);
 
                     // somehow we got to DOWN even though the list is empty, error
                     if (next_pass == NULL) {
@@ -468,7 +473,7 @@ int scheduler(void *data) {
             if(mutex_lock_interruptible(&elevator.mutex) == 0) {
                 if(mutex_lock_interruptible(&Tower.mutex) == 0) {
                   Passenger * next_pass;
-                  next_pass = list_first_entry(parameter->pass_list, Passenger, list);
+                  next_pass = list_first_entry_or_null(&parameter->pass_list, Passenger, list);
                   // somehow we got to DOWN even though the list is empty, error
                   if (next_pass == NULL) {
                     return -1;
