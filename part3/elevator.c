@@ -240,9 +240,14 @@ long start_elevator(void) {
 extern long (*STUB_issue_request)(int,int,int);
 long issue_request(int start_floor, int destination_floor, int type) {
     if(start_floor >= 0 && start_floor <= TOP_FLOOR && destination_floor >= 0 && destination_floor <= TOP_FLOOR) {
+        // write(1, "HERE 1\n", 7);
+        printk(KERN_ALERT "inside if statement\n");
         add_passenger(start_floor, destination_floor, type);
+        printk(KERN_ALERT "passenger added\n");
         return 0;
     }
+    // write(1, "HERE 2 \n", 7);
+    printk(KERN_ALERT "did not make it in if statement\n");
     return 1;
 }
 
@@ -568,7 +573,7 @@ int add_passenger(int start_floor, int destination_floor, int type){
     if(mutex_lock_interruptible(&Tower.mutex)==0){
         Tower.floor_list[start_floor]->busy=true;
         list_add_tail(&temp_passenger->list, &Tower.floor_list[start_floor]->waiting_list);
-        Tower.floor_list[start_floor]->size--;
+        Tower.floor_list[start_floor]->size++;
         mutex_unlock(&Tower.mutex);
     }
     printk(KERN_ALERT "PASSENGER CREATED\n");
