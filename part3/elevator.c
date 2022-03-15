@@ -21,7 +21,7 @@ MODULE_AUTHOR("Group 27");
 MODULE_DESCRIPTION("Implement a scheduling algorithm for a pet elevator.");
 
 //Global Variables
-#define BUF_LEN 1000
+#define BUF_LEN 100000
 #define MAX_CAPACITY 10
 #define MAX_WEIGHT 100
 #define OFFLINE 0
@@ -86,7 +86,7 @@ int add_passenger(int start_floor, int destination_floor, int type);
 //Returns string to write to PROC
 const char* print_passengers(void) {
 
-    char *buf = kmalloc(sizeof(char) * 100000, __GFP_RECLAIM);
+    char *buf = kmalloc(sizeof(char) * 1000, __GFP_RECLAIM);
     if (buf == NULL) {
      printk(KERN_ALERT "Error writing daita in print_passengers");
      return -ENOMEM;
