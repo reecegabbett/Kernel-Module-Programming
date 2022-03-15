@@ -86,22 +86,12 @@ int add_passenger(int start_floor, int destination_floor, int type);
 //Returns string to write to PROC
 const char* print_passengers(void) {
 
-    char *buf = kmalloc(sizeof(char) * 1000, __GFP_RECLAIM);
-    char state[10];
-    int elevator_here;
-    int i;
-    int floor;
-    struct list_head* temp;
-    struct list_head* dummy;
-    Passenger* tempPass;
-
-    elevator_here = elevator.current_floor;
-
+    char *buf = kmalloc(sizeof(char) * 100000, __GFP_RECLAIM);
     if (buf == NULL) {
-     printk(KERN_ALERT "Error writing data in print_passengers");
+     printk(KERN_ALERT "Error writing daita in print_passengers");
      return -ENOMEM;
     }
-
+    char state[10];
     switch(elevator.state){
         case IDLE :
             strcpy(state, "IDLE");
@@ -135,15 +125,20 @@ const char* print_passengers(void) {
     sprintf(buf, "Number of passengers serviced: %d\n", elevator.serviced);
     strcat(message, buf);
 
-
-    for (i = TOP_FLOOR-1; i >= 0; i--){
+    int elevator_here;
+    elevator_here= elevator.current_floor;
+    int i =TOP_FLOOR-1;
+    for (i; i >= 0; i--){
         char marker = ' ';
         if (elevator_here==i){
             marker='*';
         }
-        floor = i + 1;
+        int floor = i +1;
         sprintf(buf,"[%c] Floor %d: %d", marker, floor, Tower.floor_list[i]->size);
         strcat(message, buf);
+        struct list_head* temp;
+        struct list_head* dummy;
+        Passenger* tempPass;
         list_for_each_safe(temp, dummy, &Tower.floor_list[i]->waiting_list){
 
             tempPass = list_entry(temp,Passenger,list);
@@ -284,39 +279,29 @@ int scheduler(void *data) {
             }
             else if (mutex_lock_interruptible(&Tower.mutex) == 0){
                 if(Tower.waiting>0){
-                mutex_unlock(&Tower.mutex);
-                  //if people are waiting
-                  Passenger * next_waiting;
+                  mutex_unlock(&Tower.mutex);
 
+                  // if people are waiting, check which floor they're on and go
+                  // in that direction
                   int i;
                   for (i = 0; i < TOP_FLOOR; i++) {
                     if (Tower.floor_list[i]->size > 0) {
                       if (parameter->current_floor == i+1) {
+                        printk(KERN_ALERT, "idle set load\n");
                         parameter->state = LOADING;
+                        break;
                       }
                       else if (parameter->current_floor < i+1) {
+                        printk(KERN_ALERT, "idle set up\n");
                         parameter->state = UP;
+                        break;
                       }
                       else {
+                        printk(KERN_ALERT, "idle set down\n");
                         parameter->state = DOWN;
+                        break;
                       }
                     }
-                  }
-                  // need to loop through Tower.floor_list and find one with a size>0
-                  // then go to that floor first
-                  // make sure to change var names here
-                  next_waiting = list_first_entry_or_null(&parameter->pass_list, Passenger, list);
-                  if (next_waiting->destination_floor == parameter->current_floor) {
-                    parameter->state = LOADING;
-                  }
-                  else if (next_waiting->destination_floor > parameter->current_floor) {
-                    parameter->state = DOWN;
-                  }
-                  else if (next_waiting->destination_floor < parameter->current_floor) {
-                    parameter->state = UP;
-                  }
-                  else { // somehow, the list was empty but Tower.waiting was > 0? error
-                    return -1;
                   }
                 }
                 else {
@@ -338,7 +323,7 @@ int scheduler(void *data) {
             ssleep(1);
             if(mutex_lock_interruptible(&elevator.mutex) == 0) {
                 //Loading and Unloading
-                //remove the head/passenger who's getting off
+
                 struct list_head *dummy, *temp;
                 Passenger *temp_pass;
 
@@ -347,31 +332,29 @@ int scheduler(void *data) {
 
                 int count=0;
 
+                //remove the head/passenger who's getting off (FIFO)
                 list_for_each_safe(temp, dummy, &parameter->pass_list) {
                   temp_pass = list_entry(temp, Passenger, list);
-                  if (count==parameter->passengers-1) {
-                    // this is the "first item"
+                  // this is the "first item"
 
-                    int tmp_type=temp_pass->type;
-                    list_del(temp);
-                    kfree(temp_pass);
+                  int tmp_type=temp_pass->type;
+                  list_del(temp);
+                  kfree(temp_pass);
 
-                    parameter->passengers--; // decrease total number of passengers
-                    parameter->serviced++;
-                    if (tmp_type == 0) { // cat
-                      parameter->cats--;
-                      parameter->weight -= 15;
-                    } else if (tmp_type == 1) { // dog
-                      parameter->dogs--;
-                      parameter->weight -= 45;
-                    } else {//lizard
-                      parameter->lizards--;
-                      parameter->weight -= 5;
-                    }
-
-
+                  parameter->passengers--; // decrease total number of passengers
+                  parameter->serviced++;
+                  if (tmp_type == 0) { // cat
+                    parameter->cats--;
+                    parameter->weight -= 15;
+                  } else if (tmp_type == 1) { // dog
+                    parameter->dogs--;
+                    parameter->weight -= 45;
+                  } else {//lizard
+                    parameter->lizards--;
+                    parameter->weight -= 5;
                   }
-                  count++;
+                  break; // only want to unboard first passenger
+
 
                 }
 
@@ -382,7 +365,7 @@ int scheduler(void *data) {
                   // will the next passenger still fit the weight limit and capacity limit
                   if ((temp_pass2->weight + parameter->weight) <= 100 && parameter->passengers+1 <=10) {
                     // add this passenger to the elevator
-                    add_passenger(temp_pass2->beginning_floor, temp_pass2->destination_floor, temp_pass2->type);
+                    list_add_tail(&temp_pass2->list, &parameter->pass_list);
                     // floor and tower stats are updated in the add_passenger
                     // update elevator stats
                     parameter->passengers++;
@@ -394,6 +377,9 @@ int scheduler(void *data) {
                     } else {
                       parameter->lizards++;
                     }
+
+                    // make next item the head
+                    // LIST_HEAD(temp_pass2->list.next, Passenger);
                     // remove them from the current floor's list
                     list_del(temp2);
                     kfree(temp_pass2);
@@ -419,6 +405,9 @@ int scheduler(void *data) {
                 }
                 else if (next_pass->destination_floor < parameter->current_floor) {
                   parameter->state = DOWN;
+                }
+                else {
+                  parameter->state = LOADING;
                 }
 
 
@@ -446,7 +435,8 @@ int scheduler(void *data) {
 
                     // somehow we got to DOWN even though the list is empty, error
                     if (next_pass == NULL) {
-                      return -1;
+                      parameter->state = IDLE;
+                      return 0;
                     }
                     if (next_pass->destination_floor == parameter->current_floor) {
                       parameter->state = LOADING;
@@ -468,24 +458,30 @@ int scheduler(void *data) {
             ssleep(2);
             if(mutex_lock_interruptible(&elevator.mutex) == 0) {
               //move elevator up
+              printk(KERN_ALERT, "pre-floor increase\n");
               parameter->current_floor++;
+              printk(KERN_ALERT, "floor increased\n");
               // check if valid floor
               if (parameter->current_floor > TOP_FLOOR) {
                 return -1;
               }
-                mutex_unlock(&elevator.mutex);
+              mutex_unlock(&elevator.mutex);
             }
             if(mutex_lock_interruptible(&elevator.mutex) == 0) {
                 if(mutex_lock_interruptible(&Tower.mutex) == 0) {
                   Passenger * next_pass;
                   next_pass = list_first_entry_or_null(&parameter->pass_list, Passenger, list);
+                  printk(KERN_ALERT, "got first entry of pass_list\n");
                   // somehow we got to DOWN even though the list is empty, error
                   if (next_pass == NULL) {
-                    return -1;
+                    parameter->state = IDLE;
+                    return 0;
                   }
 
                     //check if we need to unload at floor
+                    printk(KERN_ALERT, "start unload check at UP\n");
                     if (next_pass->destination_floor == parameter->current_floor) {
+                      printk(KERN_ALERT, "met unload check at UP\n");
                       parameter->state = LOADING;
                     }
                     //check weight and shutdown before loading
@@ -506,43 +502,6 @@ int scheduler(void *data) {
     return 0;
 }
 
-// int add_passenger(int start_floor, int destination_floor, int type){
-//
-//
-//     Passenger *temp_passenger;
-//
-//     temp_passenger = kmalloc(sizeof(Passenger)*1, __GFP_RECLAIM);
-//     start_floor--;
-//     destination_floor--;
-//     temp_passenger->type=type;
-//     temp_passenger->beginning_floor=start_floor;
-//     temp_passenger->destination_floor=destination_floor;
-//     if (temp_passenger->type==0){
-//         temp_passenger->weight=15;
-//     } else if (temp_passenger->type==1){
-//         temp_passenger->weight=45;
-//     } else if (temp_passenger->type==2){
-//        temp_passenger->weight=5;
-//     } else {
-//         return -1;
-//     }
-//
-//
-//     if(destination_floor == start_floor){
-//         return -1;
-//     }
-//     INIT_LIST_HEAD(&temp_passenger->list);
-//     if(mutex_lock_interruptible(&Tower.mutex)==0){
-//         Tower.floor_list[start_floor]->busy=true;
-//         list_add_tail(&temp_passenger->list, &Tower.floor_list[start_floor]->waiting_list);
-//         Tower.floor_list[start_floor]->size++;
-//         mutex_unlock(&Tower.mutex);
-//     }
-//     printk(KERN_ALERT "PASSENGER CREATED\n");
-//     Tower.waiting++;
-//     return 0;
-//
-// }
 
 int add_passenger(int start_floor, int destination_floor, int type){
 
