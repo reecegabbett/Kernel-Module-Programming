@@ -136,7 +136,10 @@ When running the elevator kernel module, and it will stall and not make progress
 
 ## Part 2 Functions
 
-
+### print_timer()
+- Brief: returns a message with the necessary timer info when called
+- Parameters: void
+- Return type: char*
 
 ## Part 3 Functions
 
@@ -144,6 +147,8 @@ When running the elevator kernel module, and it will stall and not make progress
 - Brief: Reads all of the elevator and tower data and returns a string that contains the desired output table.
 - Parameters: void
 - Return type: const char*
+
+Buffer length is limited to 0.5 GB.
 
 ### add_passenger()
 - Brief: Creates a passenger, fills it's variables with the appropriate data, and adds the to the waiting list on their starting floor.
