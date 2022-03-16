@@ -1,0 +1,404 @@
+commit 46e30111b16b5e71dc6d9e449d5ef3d0e4bd642c
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Tue Mar 15 22:12:11 2022 -0400
+
+    readme updates and cleaning code
+
+commit 6fb52c6df9f77f0cae794e979590e9e709dce151
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Tue Mar 15 21:24:06 2022 -0400
+
+    Update elevator.c
+
+commit 627489e435829ca6130e94c82423664dac3872e3
+Merge: 23dc490 1178993
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Tue Mar 15 20:16:02 2022 -0400
+
+    Merge branch 'main' of https://github.com/reecegabbett/Kernel-Module-Programming
+
+commit 23dc49061fc70c165f73c55c23db2e024122848f
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Tue Mar 15 20:15:53 2022 -0400
+
+    partial revert
+
+commit 117899339fddef1a609be27234f0a04b8fa69c35
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Tue Mar 15 20:07:21 2022 -0400
+
+    Update README.md
+
+commit 8b438bd2b832fd033c1117a6ac6d581c62b8393e
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Tue Mar 15 20:03:12 2022 -0400
+
+    fixed output issue, working on scheduling
+
+    fixed appending issue with buffer
+
+commit ef4674a9d44170a2d74d7b7a72f085756aec3cab
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Tue Mar 15 17:48:24 2022 -0400
+
+    started readme, fixed timer module, attempt at bug fixing elevator,
+
+    readme- base info
+    timer- reads from proc instead of printing all to kernel log
+    elevator- attempts to change buf_len, not yet tested
+
+commit 094013e6ebbab4dc604f4c98a552f0e3b4955000
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Tue Mar 15 16:22:53 2022 -0400
+
+    various bug fixes
+
+commit cc3b23b46cc5ca4e336b99977e7fa35c75926fe5
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Mon Mar 14 20:04:52 2022 -0400
+
+    Update elevator.c
+
+commit 4402cdd5c76ca24143b43488e868fa600dcc5b4b
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Mon Mar 14 18:59:32 2022 -0400
+
+    fixed compile errors, still has wrnings
+
+commit bf9c970083cc685753f2ccd9afa45fb7dc3563ff
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Mon Mar 14 15:37:58 2022 -0400
+
+    fixing some compile errors
+
+commit becf4c70c4953608fa4e5558d099ac8aa7ed51bb
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Mon Mar 14 03:59:10 2022 -0400
+
+    added loading functionality
+
+    yet to test
+
+commit 9c63a3c3c9636a0f4a34567ef553ca3d6d081815
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Mar 13 03:09:49 2022 -0400
+
+    added most scheduler functionality except loading/unloading
+
+commit 0f1a326152e859b08887deed1575b9ff127beb3e
+Merge: 3266291 b260cfa
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sat Mar 12 17:55:12 2022 -0500
+
+    Merge branch 'main' of https://github.com/reecegabbett/Kernel-Module-Programming
+
+commit 32662915da1478811afe2ff1e507c47de47fbd2a
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sat Mar 12 17:55:08 2022 -0500
+
+    fixed spacing issue in makefile
+
+commit b260cfaba80aaa3d911a03ee9b9569e494bcf376
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Sat Mar 12 16:43:06 2022 -0500
+
+    Added Mutex Locks to Scheduler
+
+commit 994235674cadd6373f4961fbd7da17a78c67a80c
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Sat Mar 12 15:07:59 2022 -0500
+
+    Create Makefile
+
+commit e577defce766e668a62c8b9b792fb17493cdec78
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Sat Mar 12 15:06:08 2022 -0500
+
+    Create stop_elevator.c
+
+commit 5450759ccde711ea506cb49e76b60eea924e3c7e
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Sat Mar 12 15:05:32 2022 -0500
+
+    Create issue_request.c
+
+commit 5f594fd1aa3bdecb409aea4ae0cc836a191ca9a1
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Sat Mar 12 15:04:35 2022 -0500
+
+    Create start_elevator.c
+
+commit 263de58202c045f22b598f480db601367fea23ff
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Sat Mar 12 15:01:46 2022 -0500
+
+    Delete syscall_help
+
+commit 772e0ed5ce6f3f1878b1d412d8ed6c216d678f57
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Sat Mar 12 14:44:25 2022 -0500
+
+    Added Proper Print to PROC
+
+commit c9fe08b5755245b61aba038fd43a01af9f13adf3
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Sat Mar 12 14:08:51 2022 -0500
+
+    Update elevator.c
+
+commit 20e324e4151ffc75386e05aaa98d4bcdd5c88c43
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Sat Mar 12 00:40:57 2022 -0500
+
+    Added Elevator Thread with Linked Lists Skeleton
+
+commit 2d3ff81eea8bef92cf18fff2ef9603ab0c37b82b
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Fri Mar 11 21:01:10 2022 -0500
+
+    Added SYSCALLS
+
+commit 289df0acb693ce4346e1035fea3ef894363b3202
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Fri Mar 11 15:39:00 2022 -0500
+
+    Update syscall_64.tbl
+
+commit 4bc2270c49ca62d3946e5f682f007b9b883eac58
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Fri Mar 11 15:31:09 2022 -0500
+
+    Update syscall_help
+
+commit 34c94e37e7b0a0a596394d0918d3d20ea487fd87
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Fri Mar 11 15:20:19 2022 -0500
+
+    Create syscall_help
+
+commit c9efaebeeb44828ca213c042a624033c96d9d927
+Merge: a3256c3 dcef00d
+Author: Dylan Dalal <59746456+DylanDalal@users.noreply.github.com>
+Date:   Thu Mar 10 14:08:33 2022 -0500
+
+    Merge pull request #3 from reecegabbett/new-syscalls
+
+    Elevator setup.
+
+commit dcef00dbd6cd073df5d4252050e246d8646f4370
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Wed Mar 9 21:18:39 2022 -0500
+
+    Send the Elevator Data to the PROC
+
+commit f493bf1ec63b68d5835fd7bdb05884e5edaed2f6
+Merge: d31c79f e311546
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Wed Mar 9 20:36:39 2022 -0500
+
+    Merge branch 'new-syscalls' of https://github.com/reecegabbett/Kernel-Module-Programming into new-syscalls
+
+commit d31c79fa9cf2ab65b529b5c112c50ad000e800b9
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Wed Mar 9 20:36:37 2022 -0500
+
+    Working PROC functions
+
+commit e31154689809a6d077b2fa48b914312f4a007c62
+Author: Dylan Dalal <59746456+DylanDalal@users.noreply.github.com>
+Date:   Wed Mar 9 17:30:47 2022 -0500
+
+    delete Eclipse files
+
+commit 33026f6ef6884be4c511bc22105bea378c5826e9
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Wed Mar 9 17:29:42 2022 -0500
+
+    Bug Fixed Elevator.c
+
+commit 15bd9fd4b74085d82b64516b6e0ae69f2854a1e8
+Author: Dylan Dalal <dylanmax@gmail.com>
+Date:   Wed Mar 9 15:48:13 2022 -0500
+
+    Initialization
+
+commit cc5f976d66fdf63a45deabe2440da20959d51175
+Author: Dylan Dalal <dylanmax@gmail.com>
+Date:   Tue Mar 8 14:50:32 2022 -0500
+
+    Elevator struct implementation
+
+commit 023854151e2a705e3bb8e26ba46fc4e90892982a
+Author: Dylan Dalal <dylanmax@gmail.com>
+Date:   Tue Mar 8 14:48:09 2022 -0500
+
+    Elevator struct implementation
+
+commit dc03413c00366cc37a5dda9ef1451e47014467b5
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Mon Mar 7 19:06:13 2022 -0500
+
+    Added Proc Functions to elevator.c
+
+commit f9267d3536b715448f0f8f628b5c33e44a33c34f
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Mon Mar 7 16:24:53 2022 -0500
+
+    Added given test code
+
+commit 79501442113acb79ca1813be3b7919acd2c24875
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Mon Mar 7 16:10:52 2022 -0500
+
+    File Setup for Part3
+
+commit a3256c39aebd5e65f6a2801a65fbe07ff3f6d146
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Mon Mar 7 15:34:20 2022 -0500
+
+    Create Makefile
+
+commit 846c7dcfcbc2eeeb74db4374939e136658275410
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Mon Mar 7 15:34:02 2022 -0500
+
+    Delete makefile
+
+commit f617e325c33960633b13a56cf85e380083401395
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Mon Mar 7 15:33:01 2022 -0500
+
+    Create Makefile
+
+commit 4e86b9cc4b2d52114a1e2428a7d43511571de3b4
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Mon Mar 7 15:32:27 2022 -0500
+
+    Delete makefile
+
+commit 0b1898d08584f0151d0339c48dab9ceaf01b3568
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Mon Mar 7 15:30:53 2022 -0500
+
+    Update Makefile
+
+    kernel would not run make with previous makefile. Had to remake it.
+
+commit bbd3248ce2d0c306772b117133e26a7ebbd4de80
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Mar 6 23:13:21 2022 -0500
+
+    a little file setup
+
+    .tbl files are pulled from the kernel for better viewing and ability to edit
+
+commit ec25390766bcceaa3a770287a6f19a8c9e1c102e
+Merge: fc2dd28 5120930
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Mar 6 21:00:52 2022 -0500
+
+    Merge branch 'main' of https://github.com/reecegabbett/Kernel-Module-Programming
+
+commit fc2dd28cbdabaebc7412d6b2480736607a766f76
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Mar 6 21:00:04 2022 -0500
+
+    updated git-ignore
+
+    now includes something i used to test stuff
+
+commit 51209306a67d995927876bd8b50d1fea87a0f0b0
+Merge: 01b8740 d6314bc
+Author: Finley Talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Mar 6 20:51:38 2022 -0500
+
+    Merge pull request #2 from reecegabbett/kernel-module
+
+    Kernel module
+
+commit d6314bcf630bde51a3698fe1afcc824ed698341b
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Mar 6 20:50:54 2022 -0500
+
+    working timer
+
+commit 7503712b36fa5fcc41f1ed3d9adc6eec98e1d41a
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Mar 6 19:37:06 2022 -0500
+
+    working print of time
+
+commit 310e7d71bbd2c0d0f63e03b09cadae54ef18865d
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Mar 6 16:23:03 2022 -0500
+
+    adjusting makefile and more for testing
+
+commit de7c012fc50462bd6560247c813ac3cf38a86b85
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Mon Feb 21 21:24:16 2022 -0500
+
+    setup my_timer.c with necessary functions and headers
+
+commit a5ffd34813a3404f3b58ab72a8b00faede98953f
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Feb 20 23:45:11 2022 -0500
+
+    added another folder to gitignore and added some headers to timer
+
+commit 3876b1e6371dfea75dfc8a2c04de3bd191ac9ea5
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Feb 20 23:15:37 2022 -0500
+
+    file structure
+
+commit 01b8740f510bdc46ccc765ea8044ebb333005e5a
+Merge: 90197c5 52b04df
+Author: Finley Talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Feb 20 23:06:59 2022 -0500
+
+    Merge pull request #1 from reecegabbett/system-calls
+
+    System calls
+
+commit 52b04dfb8dbd8c2092756a733a8a4626d3ea72f3
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Tue Feb 15 21:39:40 2022 -0500
+
+    Create .gitignore
+
+commit 6a4f17cff464dfac33401a57fce57e610554a852
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Tue Feb 15 00:17:37 2022 -0500
+
+    trace files created from executables
+
+commit 4f8172e04dab0a2bdfbb50a0a00f55c8faf45df5
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Feb 13 16:47:27 2022 -0500
+
+    using write as syscalls instead
+
+commit 66a85b6277318cf03c7d570253d296712b016e7a
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Feb 13 16:44:50 2022 -0500
+
+    removed system() , wrong syscalls
+
+commit 5ab1629494863afe5ceb31e091dd69e78cea9a42
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Feb 13 10:10:17 2022 -0500
+
+    added system calls
+
+commit 3513bebaaf16c3cb6d99a826deaacb093afc67dc
+Author: finley-talley <73396510+finley-talley@users.noreply.github.com>
+Date:   Sun Feb 13 10:06:59 2022 -0500
+
+    basic file structure for part1
+
+commit 90197c5368e68223b04666d023cc07f4546ea817
+Author: Reece Gabbett <81770210+reecegabbett@users.noreply.github.com>
+Date:   Tue Feb 8 16:11:30 2022 -0500
+
+    Initial commit

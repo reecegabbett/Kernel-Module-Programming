@@ -1,5 +1,13 @@
 # finley's personal folder used to share files with shared folder on virtualbox
 shared/
+
 # a folder to test the hello world kernel module in slide 3
 test-kernel/
 testfile.c
+
+# part 3 files not needed
+part3/sys_call.c
+part3/syscall_32.tbl
+part3/syscall_64.tbl
+
+part2.zip

@@ -13,6 +13,7 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Group 27");
 MODULE_DESCRIPTION("Timer to print current time and elapsed time since last call");
 
+// globals
 #define ENTRY_NAME "timer"
 #define PERMS 0644
 #define PARENT NULL
@@ -25,8 +26,6 @@ static long long s_temp;
 static char message[BUF_LEN];
 static int len;
 
-// time.h reference
-// https://docs.huihoo.com/doxygen/linux/kernel/3.7/include_2linux_2time_8h.html
 
 char* print_timer(void) {
 
@@ -44,6 +43,7 @@ char* print_timer(void) {
   sprintf(buf, "current time: %lld.%ld\n", s_time, ns_time);
   strcat(message, buf);
 
+  // print elapsed time second and subsequent reads only
   if (activated != 1) {
     activated = 1;
     ns_temp = ns_time;
@@ -52,6 +52,7 @@ char* print_timer(void) {
   else {
     int elapsed_ns = ns_time-ns_temp;
     if (elapsed_ns < 0) {
+      // prevent negative ns
       elapsed_ns = 1-elapsed_ns;
     }
     sprintf(buf, "elapsed time: %lld.%ld\n", s_time-s_temp, elapsed_ns);
@@ -66,6 +67,7 @@ char* print_timer(void) {
 
 int my_timer_proc_open(struct inode *sp_inode, struct file *sp_file) {
   printk("proc called open\n");
+  // called every time we cat /proc/timer
   strcpy(message, print_timer());
   if (message == NULL) {
     printk("Error, proc_open");
@@ -93,23 +95,6 @@ ssize_t my_timer_proc_read(struct file *sp_file, char *ubuf, size_t size, loff_t
   return len;
 
 }
-
-// static ssize_t elevator_proc_write(struct file* sp_file, const char * ubuf, size_t size, loff_t* offset)
-// {
-//     printk(KERN_INFO "proc_write\n");
-//
-//     if (size > BUF_LEN)
-//         len = BUF_LEN;
-//     else
-//         len = size;
-//
-//     copy_from_user(print_timer(), ubuf, len);
-//
-//     printk(KERN_INFO "got from user: %s\n", message);
-//
-//     return len;
-// }
-
 
 static int my_timer_proc_release(struct inode *sp_inode,
 struct file *sp_file) {
