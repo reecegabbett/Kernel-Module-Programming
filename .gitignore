@@ -11,3 +11,19 @@ part3/syscall_32.tbl
 part3/syscall_64.tbl
 
 part2.zip
+project3_dalal_gabbett_talley.tar
+project3_dalal_gabbett_talley/git-log
+project3_dalal_gabbett_talley/part1/empty.c
+project3_dalal_gabbett_talley/part1/empty.trace
+project3_dalal_gabbett_talley/part1/empty.x
+project3_dalal_gabbett_talley/part1/part1.c
+project3_dalal_gabbett_talley/part1/part1.trace
+project3_dalal_gabbett_talley/part1/part1.x
+project3_dalal_gabbett_talley/part2/Makefile
+project3_dalal_gabbett_talley/part2/my_timer.c
+project3_dalal_gabbett_talley/part3/elevator.c
+project3_dalal_gabbett_talley/part3/issue_request.c
+project3_dalal_gabbett_talley/part3/Makefile
+project3_dalal_gabbett_talley/part3/start_elevator.c
+project3_dalal_gabbett_talley/part3/stop_elevator.c
+project3_dalal_gabbett_talley/README.md
