@@ -30,32 +30,77 @@ Code written by: Dylan Dalal, Reece Gabbett, Finley Talley
 - Timer Proc Read Function
 - Timer Proc Write Function
 - Added most of Scheduler functionality
-- Added Loading functionality
+- Added Loading and unloading functionality
 - Bug fixing
-- Started Readme
+- Started and contributed to Readme
+
+## How to Run Part 1
+1. Compile the empty and part 1 files with `gcc empty.c -o empty.x` and `gcc part1.c -o part1.x` respectively. There is no makefile for part 1.
+2. Obtain the strace files with `strace empty.c -o empty.x` and `strace part1.c -o part1.x`
+
+## How to Run Part 2
+1. We will assume you have installed the necessary kernel and headers.
+2. Put all files of `part2/` into directory `/usr/src/linux/my_timer`
+3. Enter the directory in step 2, and compile the kernel module with  `sudo make`
+4. Install the kernel module with `sudo insmod my_timer.ko`
+5. Run cat `/proc/timer`. Second and subsequent runs will introduced the "elapsed time" between reads
+
+You can uninstall this kernel module with `rmmod my_timer`.
+
+## How to Run Part 3
+1. We will assume you have installed kernel 4.19 and the necessary headers.
+2. Put all files of `part3/` into directory `/usr/src/linux-4.19.98/elevator`
+3. Edit the necessary table files, Makefile, and syscall files to account for the three new syscalls
+4. Log into root with `sudo -s` and enter te directory in step 3
+5. Compile the kernel module with `make`
+6. Install the kernel module with `insmod elevator.ko`
+7. Compile the producer and consumer files with `gcc producer.c -o producer.x` and `gcc consumer.c -o consumer.x` respectively
+8. Start the elevator with `./consumer.x --start`
+9. Issue requests to the elevator with passengers with `./producer.x <number of requests>`
+10. To read from proc, first update the proc file `echo > /proc/elevator` and then run `cat /proc/elevator`
+11. We recommend a script for reading from proc, such as:
+```
+#!/bin/bash
+
+./consumer.x --start
+./producer.x 10
+
+while :
+do
+    echo > /proc/elevator
+    cat /proc/elevator
+    echo -e "----------"
+    sleep 1
+done
+```
+
+Additionally, you can stop the elevator with `./consumer.x --stop`.
+You can uninstall the kernel module with `rmmod elevator`
+We recommend that you reset your machine between starts of the elevator.
 
 ## Contents of .tar
 ### part1
-- empty.c
-- empty.trace
-- part1.c
-- part1.trace
+- empty.c: an empty C file
+- empty.trace: the trace file for empty.c
+- part1.c: a C file with 4 system calls
+- part1.trace: the trace file for part1.c
 
 ### part2
-- my_timer.c
-- Makefile
+- my_timer.c: a kernel module for an elapsed seconds timer and seconds since Epoch
+- Makefile: makefile for the kernel module above
 
 ### part3
-- elevator.c
-- start_elevator.c
-- stop_elevator.c
-- issue_request.c
-- Makefile
+- elevator.c: elevator kernel module
+- start_elevator.c: start_elevator() system call
+- stop_elevator.c: stop_elevator() system call
+- issue_request.c: issue_request() system call
+- Makefile: makefile for elevator kernel module
 
 ## Bugs
 
-### Bug name: Part
-Bug details here
+### Stalling of elevator: part 3
+Type: Runtime error
+When running the elevator kernel module, and it will stall and not make progress past floor 2. While we could not fully locate the source of the error, after double checking the logic of Loading, Unloading, and moving the elevator Up and Down, we are concluding the error is likely related to threading and locks. Specifically, we suspect that variables are changing while we have improperly handled the locks and other deadlocking situations.
 
 ## Data Structs in Part 3
 
@@ -87,6 +132,10 @@ Bug details here
 - Floor_list: A list of all the floors the elevator can reach to.
 - Waiting: Tracks how many people are currently waiting.
 - Mutex: Allows for thread locking.
+
+## Part 2 Functions
+
+
 
 ## Part 3 Functions
 

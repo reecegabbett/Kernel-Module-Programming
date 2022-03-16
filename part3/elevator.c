@@ -238,14 +238,9 @@ long start_elevator(void) {
 extern long (*STUB_issue_request)(int,int,int);
 long issue_request(int start_floor, int destination_floor, int type) {
     if(start_floor >= 0 && start_floor <= TOP_FLOOR && destination_floor >= 0 && destination_floor <= TOP_FLOOR) {
-        // write(1, "HERE 1\n", 7);
-        printk(KERN_ALERT "inside if statement\n");
         add_passenger(start_floor, destination_floor, type);
-        printk(KERN_ALERT "passenger added\n");
         return 0;
     }
-    // write(1, "HERE 2 \n", 7);
-    printk(KERN_ALERT "did not make it in if statement\n");
     return 1;
 }
 
@@ -273,19 +268,15 @@ int scheduler(void *data) {
 
 
         if(state==IDLE){
-            printk(KERN_ALERT, "in idle\n");
             //if stop_elevator has been ran
             if(elevator_on==false){
                 if(mutex_lock_interruptible(&elevator.mutex) == 0) {
-                    printk(KERN_ALERT, "lock if elevator on false\n");
                     parameter->state = OFFLINE;
                     mutex_unlock(&elevator.mutex);
                 }
             }
             else if (mutex_lock_interruptible(&Tower.mutex) == 0){
-              printk(KERN_ALERT, "lock else if\n");
                 if(Tower.waiting>0){
-                  printk(KERN_ALERT, "if Tower waiting\n");
                   mutex_unlock(&Tower.mutex);
 
                   // if people are waiting, check which floor they're on and go
@@ -294,17 +285,14 @@ int scheduler(void *data) {
                   for (i = 0; i < TOP_FLOOR; i++) {
                     if (Tower.floor_list[i]->size > 0) {
                       if (parameter->current_floor == i+1) {
-                        printk(KERN_ALERT, "idle set load\n");
                         parameter->state = LOADING;
                         break;
                       }
                       else if (parameter->current_floor < i+1) {
-                        printk(KERN_ALERT, "idle set up\n");
                         parameter->state = UP;
                         break;
                       }
                       else {
-                        printk(KERN_ALERT, "idle set down\n");
                         parameter->state = DOWN;
                         break;
                       }
@@ -327,7 +315,6 @@ int scheduler(void *data) {
 
 
         else if (state==LOADING){
-            printk(KERN_ALERT, "in loading\n");
             ssleep(1);
             if(mutex_lock_interruptible(&elevator.mutex) == 0) {
                 //Loading and Unloading
@@ -386,8 +373,6 @@ int scheduler(void *data) {
                       parameter->lizards++;
                     }
 
-                    // make next item the head
-                    // LIST_HEAD(temp_pass2->list.next, Passenger);
                     // remove them from the current floor's list
                     list_del(temp2);
                     kfree(temp_pass2);
@@ -448,11 +433,7 @@ int scheduler(void *data) {
                     if (next_pass->destination_floor == parameter->current_floor) {
                       parameter->state = LOADING;
                     }
-                    //check weight and shutdown before loading
 
-                    //check if bottom floor
-
-                    //set next state
                     mutex_unlock(&Tower.mutex);
                 }
                 mutex_unlock(&elevator.mutex);
@@ -461,14 +442,11 @@ int scheduler(void *data) {
 
 
         else if(state==UP){
-            printk(KERN_ALERT, "in UP\n");
             //check current floor for passengers
             ssleep(2);
             if(mutex_lock_interruptible(&elevator.mutex) == 0) {
               //move elevator up
-              printk(KERN_ALERT, "pre-floor increase\n");
               parameter->current_floor++;
-              printk(KERN_ALERT, "floor increased\n");
               // check if valid floor
               if (parameter->current_floor > TOP_FLOOR) {
                 return -1;
@@ -479,20 +457,15 @@ int scheduler(void *data) {
                 if(mutex_lock_interruptible(&Tower.mutex) == 0) {
                   Passenger * next_pass;
                   next_pass = list_first_entry_or_null(&parameter->pass_list, Passenger, list);
-                  printk(KERN_ALERT, "got first entry of pass_list\n");
                   // somehow we got to DOWN even though the list is empty, error
                   if (next_pass == NULL) {
                     parameter->state = IDLE;
                   }
 
                     //check if we need to unload at floor
-                    printk(KERN_ALERT, "start unload check at UP\n");
                     if (next_pass->destination_floor == parameter->current_floor) {
-                      printk(KERN_ALERT, "met unload check at UP\n");
                       parameter->state = LOADING;
                     }
-                    //check weight and shutdown before loading
-                    //set next state
                     mutex_unlock(&Tower.mutex);
                 }
                 mutex_unlock(&elevator.mutex);
