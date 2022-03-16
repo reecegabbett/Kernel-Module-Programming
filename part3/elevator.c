@@ -273,15 +273,19 @@ int scheduler(void *data) {
 
 
         if(state==IDLE){
+            printk(KERN_ALERT, "in idle\n");
             //if stop_elevator has been ran
             if(elevator_on==false){
                 if(mutex_lock_interruptible(&elevator.mutex) == 0) {
+                    printk(KERN_ALERT, "lock if elevator on false\n");
                     parameter->state = OFFLINE;
                     mutex_unlock(&elevator.mutex);
                 }
             }
             else if (mutex_lock_interruptible(&Tower.mutex) == 0){
+              printk(KERN_ALERT, "lock else if\n");
                 if(Tower.waiting>0){
+                  printk(KERN_ALERT, "if Tower waiting\n");
                   mutex_unlock(&Tower.mutex);
 
                   // if people are waiting, check which floor they're on and go
@@ -323,6 +327,7 @@ int scheduler(void *data) {
 
 
         else if (state==LOADING){
+            printk(KERN_ALERT, "in loading\n");
             ssleep(1);
             if(mutex_lock_interruptible(&elevator.mutex) == 0) {
                 //Loading and Unloading
@@ -439,7 +444,6 @@ int scheduler(void *data) {
                     // somehow we got to DOWN even though the list is empty, error
                     if (next_pass == NULL) {
                       parameter->state = IDLE;
-                      return 0;
                     }
                     if (next_pass->destination_floor == parameter->current_floor) {
                       parameter->state = LOADING;
@@ -457,6 +461,7 @@ int scheduler(void *data) {
 
 
         else if(state==UP){
+            printk(KERN_ALERT, "in UP\n");
             //check current floor for passengers
             ssleep(2);
             if(mutex_lock_interruptible(&elevator.mutex) == 0) {
@@ -478,7 +483,6 @@ int scheduler(void *data) {
                   // somehow we got to DOWN even though the list is empty, error
                   if (next_pass == NULL) {
                     parameter->state = IDLE;
-                    return 0;
                   }
 
                     //check if we need to unload at floor
