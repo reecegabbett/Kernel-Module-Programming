@@ -74,8 +74,8 @@ do
 done
 ```
 
-Additionally, you can stop the elevator with `./consumer.x --stop`.
-You can uninstall the kernel module with `rmmod elevator`
+Additionally, you can stop the elevator with `./consumer.x --stop`.  
+You can uninstall the kernel module with `rmmod elevator`.   
 We recommend that you reset your machine between starts of the elevator.
 
 ## Contents of .tar
@@ -100,6 +100,7 @@ We recommend that you reset your machine between starts of the elevator.
 
 ### Stalling of elevator: part 3
 Type: Runtime error
+
 When running the elevator kernel module, and it will stall and not make progress past floor 2. While we could not fully locate the source of the error, after double checking the logic of Loading, Unloading, and moving the elevator Up and Down, we are concluding the error is likely related to threading and locks. Specifically, we suspect that variables are changing while we have improperly handled the locks and other deadlocking situations.
 
 ## Data Structs in Part 3
@@ -198,5 +199,3 @@ When running the elevator kernel module, and it will stall and not make progress
 - Brief: deactivates syscalls and removes any data, threads, and locks before killing the elevator.
 - Parameters: void
 - Return type: void
-
-Additional details or limitations
