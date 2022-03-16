@@ -21,7 +21,7 @@ MODULE_AUTHOR("Group 27");
 MODULE_DESCRIPTION("Implement a scheduling algorithm for a pet elevator.");
 
 //Global Variables
-#define BUF_LEN 100000
+#define BUF_LEN 500000000
 #define MAX_CAPACITY 10
 #define MAX_WEIGHT 100
 #define OFFLINE 0
@@ -86,9 +86,9 @@ int add_passenger(int start_floor, int destination_floor, int type);
 //Returns string to write to PROC
 const char* print_passengers(void) {
 
-    char *buf = kmalloc(sizeof(char) * 1000, __GFP_RECLAIM);
+    char *buf = kmalloc(sizeof(char) * 100000, __GFP_RECLAIM);
     if (buf == NULL) {
-     printk(KERN_ALERT "Error writing daita in print_passengers");
+     printk(KERN_ALERT "Error writing data in print_passengers");
      return -ENOMEM;
     }
     char state[10];
@@ -110,6 +110,9 @@ const char* print_passengers(void) {
             break;
 
     }
+
+    strcpy(message, "");
+
     sprintf(buf, "Elevator state: %s\n", state);
     strcat(message, buf);
     sprintf(buf, "Elevator floor: %d\n", elevator.current_floor+1);
@@ -166,7 +169,7 @@ const char* print_passengers(void) {
 
 
     //kfree(buf);
-    return buf;
+    return message;
 }
 
 //Reads PROC
@@ -283,26 +286,29 @@ int scheduler(void *data) {
 
                   // if people are waiting, check which floor they're on and go
                   // in that direction
-                  int i;
-                  for (i = 0; i < TOP_FLOOR; i++) {
-                    if (Tower.floor_list[i]->size > 0) {
-                      if (parameter->current_floor == i+1) {
-                        printk(KERN_ALERT, "idle set load\n");
-                        parameter->state = LOADING;
-                        break;
-                      }
-                      else if (parameter->current_floor < i+1) {
-                        printk(KERN_ALERT, "idle set up\n");
-                        parameter->state = UP;
-                        break;
-                      }
-                      else {
-                        printk(KERN_ALERT, "idle set down\n");
-                        parameter->state = DOWN;
-                        break;
-                      }
-                    }
-                  }
+                  // int i;
+                  // for (i = 0; i < TOP_FLOOR; i++) {
+                  //   if (Tower.floor_list[i]->size > 0) {
+                  //     if (parameter->current_floor == i+1) {
+                  //       printk(KERN_ALERT, "idle set load\n");
+                  //       parameter->state = LOADING;
+                  //       break;
+                  //     }
+                  //     else if (parameter->current_floor < i+1) {
+                  //       printk(KERN_ALERT, "idle set up\n");
+                  //       parameter->state = UP;
+                  //       break;
+                  //     }
+                  //     else {
+                  //       printk(KERN_ALERT, "idle set down\n");
+                  //       parameter->state = DOWN;
+                  //       break;
+                  //     }
+                  //   }
+                  // }
+
+                  parameter->state = LOADING;
+                  // in LOADING, we'll check what floor has people waiting
                 }
                 else {
                   //nobody waiting
@@ -363,7 +369,7 @@ int scheduler(void *data) {
 
                 list_for_each_safe(temp2, dummy2, &Tower.floor_list[parameter->current_floor-1]->waiting_list) {
                   // will the next passenger still fit the weight limit and capacity limit
-                  if ((temp_pass2->weight + parameter->weight) <= 100 && parameter->passengers+1 <=10) {
+                  if (((temp_pass2->weight + parameter->weight) <= 100) && ((parameter->passengers+1)<=10)) {
                     // add this passenger to the elevator
                     list_add_tail(&temp_pass2->list, &parameter->pass_list);
                     // floor and tower stats are updated in the add_passenger
@@ -398,6 +404,7 @@ int scheduler(void *data) {
                 if (next_pass == NULL) {
                   // everyone unboarded here
                   parameter->state = IDLE;
+                  return 0;
                 }
 
                 if (next_pass->destination_floor > parameter->current_floor) {
